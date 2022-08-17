@@ -2,9 +2,9 @@
 
 namespace Space\Image;
 
+use Space\Image\Commands\ImageCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Space\Image\Commands\ImageCommand;
 
 class ImageServiceProvider extends PackageServiceProvider
 {
