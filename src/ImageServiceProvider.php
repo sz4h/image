@@ -20,6 +20,7 @@ class ImageServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasRoutes('web')
             ->hasViews()
+	        ->hasAssets()
             ->hasCommand(ImageCommand::class);
     }
 }
