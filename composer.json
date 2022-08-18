@@ -1,7 +1,8 @@
 {
-  "name": "space/image",
-  "description": "This is my package image",
+  "name": "sz4h/image",
+  "description": "This image on the fly resize package",
   "keywords": [
+    "sz4h",
     "space",
     "laravel",
     "image"

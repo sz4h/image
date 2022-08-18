@@ -1,11 +1,9 @@
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/support-ukraine.svg?t=1" />](https://supportukrainenow.org)
+# This image on the fly resize package
 
-# This is my package image
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/space/image.svg?style=flat-square)](https://packagist.org/packages/space/image)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/space/image/run-tests?label=tests)](https://github.com/space/image/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/space/image/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/space/image/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/space/image.svg?style=flat-square)](https://packagist.org/packages/space/image)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/sz4h/image.svg?style=flat-square)](https://packagist.org/packages/space/image)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/sz4h/image/run-tests?label=tests)](https://github.com/space/image/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/sz4h/image/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/space/image/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/sz4h/image.svg?style=flat-square)](https://packagist.org/packages/space/image)
 
 This package simplifies the resized version of stored images. It's support both local images and remote ones. It uses
 the intervention/image.
@@ -181,7 +179,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Ahmed Safaa](https://github.com/sz4h)
+- [Ahmed Safaa](https://github.com/mello21century)
 - [All Contributors](../../contributors)
 
 ## License
