@@ -23,7 +23,7 @@ Apply some kind of cache mechanism on top of the resize core
 You can install the package via composer:
 
 ```bash
-composer require space/image
+composer require sz4h/image
 ```
 
 You should publish the config/assets file with:
