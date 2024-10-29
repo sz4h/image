@@ -30,11 +30,11 @@ if (!function_exists('resize_url')) {
 		}
 
 
-		$url .= (isset($options['crop'])) ? "&crop={$options['crop']}" : '&crop=' . config('image.default.crop');
-		$url .= (isset($options['retain'])) ? "&retain={$options['retain']}" : '&retain=' . config('image.default.retain');
-		$url .= (isset($options['bg'])) ? "&bg={$options['bg']}" : '&bg=' . config('image.default.bg');
-		$url .= (isset($options['watermark'])) ? "&watermark={$options['watermark']}" : '&watermark=' . config('image.default.watermark');
+		$url .= (isset($options['crop'])) ? "&crop={$options['crop']}" : '&crop=' . config('sz4h-image.default.crop');
+		$url .= (isset($options['retain'])) ? "&retain={$options['retain']}" : '&retain=' . config('sz4h-image.default.retain');
+		$url .= (isset($options['bg'])) ? "&bg={$options['bg']}" : '&bg=' . config('sz4h-image.default.bg');
+		$url .= (isset($options['watermark'])) ? "&watermark={$options['watermark']}" : '&watermark=' . config('sz4h-image.default.watermark');
 
-		return route(config('image.route.name'), ['url' => $url]);
+		return route(config('sz4h-image.route.name'), ['url' => $url]);
 	}
 }

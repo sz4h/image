@@ -41,7 +41,7 @@ class ImageController extends Controller
 		try {
 			$image = Image::make($path);
 		} catch (NotFoundException | Exception $e) {
-			$image = Image::make(config('image.not_found_image_path'));
+			$image = Image::make(config('sz4h-image.not_found_image_path'));
 		}
 
 		// Resize or Crop
@@ -50,7 +50,7 @@ class ImageController extends Controller
 			try {
 				$thumb = Image::make($path);
 			} catch (NotFoundException | Exception $e) {
-				$thumb = Image::make(config('image.not_found_image_path'));
+				$thumb = Image::make(config('sz4h-image.not_found_image_path'));
 			}
 			$thumb->resize($w, $h, function ($constraint) use ($r) {
 				if ($r) {
@@ -69,22 +69,22 @@ class ImageController extends Controller
 
 		if ($wm) {
 			try {
-				$watermarkImage = Image::make(config('image.watermark.image'));
+				$watermarkImage = Image::make(config('sz4h-image.watermark.image'));
 			} catch (NotFoundException | Exception $e) {
-				$watermarkImage = Image::make(config('image.not_found_image_path'));
+				$watermarkImage = Image::make(config('sz4h-image.not_found_image_path'));
 			}
 			$watermarkImage->resize(
-				$w * config('image.watermark.ratio'),
-				$h * config('image.watermark.ratio'),
+				$w * config('sz4h-image.watermark.ratio'),
+				$h * config('sz4h-image.watermark.ratio'),
 				function ($constraint) {
 					$constraint->aspectRatio();
 				}
 			);
 			$image->insert(
 				$watermarkImage,
-				config('image.watermark.position'),
-				config('image.watermark.offsetX'),
-				config('image.watermark.offsetY')
+				config('sz4h-image.watermark.position'),
+				config('sz4h-image.watermark.offsetX'),
+				config('sz4h-image.watermark.offsetY')
 			);
 		}
 
@@ -95,7 +95,7 @@ class ImageController extends Controller
 	protected function setParams()
 	{
 		$pathParts = collect(explode('/', $this->url));
-		$presets = config('image.presets');
+		$presets = config('sz4h-image.presets');
 		$this->params = collect([]);
 		$type = 'local';
 		$presetString = request()->getQueryString();
@@ -150,22 +150,22 @@ class ImageController extends Controller
 	protected function defaultParams()
 	{
 		if (!$this->params->has('w')) {
-			$this->params->put('w', config('image.default.w', 200));
+			$this->params->put('w', config('sz4h-image.default.w', 200));
 		}
 		if (!$this->params->has('h')) {
-			$this->params->put('h', config('image.default.h', 200));
+			$this->params->put('h', config('sz4h-image.default.h', 200));
 		}
 		if (!$this->params->has('crop')) {
-			$this->params->put('crop', config('image.default.crop', true));
+			$this->params->put('crop', config('sz4h-image.default.crop', true));
 		}
 		if (!$this->params->has('retain')) {
-			$this->params->put('retain', config('image.default.retain', true));
+			$this->params->put('retain', config('sz4h-image.default.retain', true));
 		}
 		if (!$this->params->has('bg')) {
-			$this->params->put('bg', config('image.default.bg'));
+			$this->params->put('bg', config('sz4h-image.default.bg'));
 		}
 		if (!$this->params->has('watermark')) {
-			$this->params->put('watermark', config('image.default.watermark', false));
+			$this->params->put('watermark', config('sz4h-image.default.watermark', false));
 		}
 	}
 }
