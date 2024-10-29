@@ -17,7 +17,7 @@ class ImageServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('image')
-            ->hasConfigFile()
+            ->hasConfigFile('sz4h-image')
             ->hasRoutes('web')
             ->hasViews()
 	        ->hasAssets()
