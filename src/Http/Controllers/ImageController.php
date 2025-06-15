@@ -9,6 +9,7 @@ use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Laravel\Facades\Image;
 use Masterminds\HTML5\Exception;
 use Space\Image\Exceptions\CanNotHandleNonImageType;
+use Intervention\Image\Exceptions\DecoderException;
 
 class ImageController extends Controller
 {
@@ -48,7 +49,7 @@ class ImageController extends Controller
             $image = Image::create($w, $h, $bg);
             try {
                 $thumb = Image::read($path);
-            } catch (NotFoundException|Exception $e) {
+            } catch (NotFoundException|Exception|DecoderException $e) {
                 $thumb = Image::read(config('sz4h-image.not_found_image_path'));
             }
             $thumb->resize($w, $h, function ($constraint) use ($r) {
