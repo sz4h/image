@@ -40,7 +40,7 @@ class ImageController extends Controller
         // Make the image
         try {
             $image = Image::read($path);
-        } catch (NotFoundException|Exception $e) {
+        } catch (NotFoundException|Exception|DecoderException $e) {
             $image = Image::read(config('sz4h-image.not_found_image_path'));
         }
 
