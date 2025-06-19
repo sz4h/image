@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Intervention\Image\Exception\NotFoundException;
+use Intervention\Image\Interfaces\ImageInterface;
 use Intervention\Image\Laravel\Facades\Image;
 use Masterminds\HTML5\Exception;
 use Space\Image\Exceptions\CanNotHandleNonImageType;
@@ -22,70 +23,27 @@ class ImageController extends Controller
         $this->url = $url;
         $this->setParams();
 
-        // Width
-        $w = (int)$this->params->get('w');
-        // Height
-        $h = (int)$this->params->get('h');
-        // Ratio
-        $r = (bool)$this->params->get('retain');
-        // Watermark
-        $wm = (bool)$this->params->get('watermark');
-        // Crop
-        $c = (bool)$this->params->get('crop');
-        // Background
-        $bg = empty($this->params->get('bg')) ? null : $this->params->get('bg');
-
-        $path = ($this->params->get('type') == 'local') ? public_path($this->params->get('url')) : file_get_contents($this->params->get('url'));
 
         // Make the image
         try {
-            $image = Image::read($path);
+            $image = Image::read($this->path);
         } catch (NotFoundException|Exception|DecoderException $e) {
             $image = Image::read(config('sz4h-image.not_found_image_path'));
         }
 
         // Resize or Crop
-        if ($c) {
-            $image = Image::create($w, $h, $bg);
-            try {
-                $thumb = Image::read($path);
-            } catch (NotFoundException|Exception|DecoderException $e) {
-                $thumb = Image::read(config('sz4h-image.not_found_image_path'));
-            }
-            $thumb->resize($w, $h, function ($constraint) use ($r) {
-                if ($r) {
-                    $constraint->aspectRatio();
-                }
-            });
-            $image->place($thumb, 'center', 0, 0);
-            // $image->resize($w,$h,$r)->crop($w,$h);
+        if ($this->c) {
+            $image = $image->cover($this->w, $this->h);
         } else {
-            $image->resize($w, $h, function ($constraint) use ($r) {
-                if ($r) {
-                    $constraint->aspectRatio();
-                }
-            });
+            if ($this->r) {
+                $image = $image->scale($this->w, $this->h);
+            } else {
+                $image = $image->resize($this->w, $this->h);
+            }
         }
 
-        if ($wm) {
-            try {
-                $watermarkImage = Image::read(config('sz4h-image.watermark.image'));
-            } catch (NotFoundException|Exception $e) {
-                $watermarkImage = Image::read(config('sz4h-image.not_found_image_path'));
-            }
-            $watermarkImage->resize(
-                $w * config('sz4h-image.watermark.ratio'),
-                $h * config('sz4h-image.watermark.ratio'),
-                function ($constraint) {
-                    $constraint->aspectRatio();
-                }
-            );
-            $image->place(
-                $watermarkImage,
-                config('sz4h-image.watermark.position'),
-                config('sz4h-image.watermark.offsetX'),
-                config('sz4h-image.watermark.offsetY')
-            );
+        if ($this->wm) {
+            $image = $this->watermark($image);
         }
 
         // View The Image
@@ -135,6 +93,22 @@ class ImageController extends Controller
         ])) {
             throw new CanNotHandleNonImageType(last(explode('.', $this->params->get('url'))));
         };
+
+        // Width
+        $this->w = $this->params->get('w');
+        // Height
+        $this->h = $this->params->get('h');
+        // Ratio
+        $this->r = (bool)$this->params->get('retain');
+        // Watermark
+        $this->wm = (bool)$this->params->get('watermark');
+        // Crop
+        $this->c = (bool)$this->params->get('crop');
+        // Background
+        $this->bg = empty($this->params->get('bg')) ? null : $this->params->get('bg');
+
+        $this->path = ($this->params->get('type') == 'local') ? public_path($this->params->get('url')) : file_get_contents($this->params->get('url'));
+
     }
 
     /**
@@ -155,10 +129,10 @@ class ImageController extends Controller
     protected function defaultParams()
     {
         if (!$this->params->has('w')) {
-            $this->params->put('w', config('sz4h-image.default.w', 200));
+            $this->params->put('w', config('sz4h-image.default.w', null));
         }
         if (!$this->params->has('h')) {
-            $this->params->put('h', config('sz4h-image.default.h', 200));
+            $this->params->put('h', config('sz4h-image.default.h', null));
         }
         if (!$this->params->has('crop')) {
             $this->params->put('crop', config('sz4h-image.default.crop', true));
@@ -172,5 +146,33 @@ class ImageController extends Controller
         if (!$this->params->has('watermark')) {
             $this->params->put('watermark', config('sz4h-image.default.watermark', false));
         }
+    }
+
+    /**
+     * @param ImageInterface $image
+     * @return void
+     */
+    protected function watermark(ImageInterface $image): ImageInterface
+    {
+        try {
+            $watermarkImage = Image::read(config('sz4h-image.watermark.image'));
+        } catch (NotFoundException|Exception $e) {
+            $watermarkImage = Image::read(config('sz4h-image.not_found_image_path'));
+        }
+        $wmWidth = $this->h * config('sz4h-image.watermark.ratio');
+        $wmHeight = $this->w * config('sz4h-image.watermark.ratio');
+        $wmHeight = $wmHeight ? $wmHeight : null;
+        $wmWidth = $wmWidth ? $wmWidth : null;
+        $watermarkImage->scale(
+            $wmWidth,
+            $wmHeight,
+        );
+        $image = $image->place(
+            $watermarkImage,
+            config('sz4h-image.watermark.position'),
+            config('sz4h-image.watermark.offsetX'),
+            config('sz4h-image.watermark.offsetY')
+        );
+        return $image;
     }
 }
