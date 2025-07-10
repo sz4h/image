@@ -88,7 +88,7 @@ class ImageController extends Controller
         /* Fall down to default params if not set by request */
         $this->defaultParams();
 
-        if (!Str::of((string)$this->params->get('url'))->endsWith([
+        if (!str((string)$this->params->get('url'))->lower()->endsWith([
             '.jpg', '.gif', '.bmp', '.jpeg', '.bmp', '.webp', '.png'
         ])) {
             throw new CanNotHandleNonImageType(last(explode('.', $this->params->get('url'))));
