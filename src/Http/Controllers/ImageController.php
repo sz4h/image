@@ -17,6 +17,8 @@ class ImageController extends Controller
 
     private Collection $params;
 
+    private bool $fallback = false;
+
     public function resize(?string $url = null)
     {
         $this->url = $url;
@@ -55,7 +57,7 @@ class ImageController extends Controller
 
     protected function setParams()
     {
-        $pathParts = collect(explode('/', $this->url));
+        $pathParts = collect(explode('/', (string) $this->url));
         $presets = config('sz4h-image.presets');
         $this->params = collect([]);
         $type = 'local';
@@ -85,10 +87,15 @@ class ImageController extends Controller
         /* Fall down to default params if not set by request */
         $this->defaultParams();
 
-        if (! str((string) $this->params->get('url'))->lower()->endsWith([
+        $requestedUrl = (string) $this->params->get('url');
+
+        /* No image was requested at all — serve the fallback instead of failing */
+        $this->fallback = trim($requestedUrl, '/') === '';
+
+        if (! $this->fallback && ! str($requestedUrl)->lower()->endsWith([
             '.jpg', '.gif', '.bmp', '.jpeg', '.bmp', '.webp', '.png',
         ])) {
-            throw new CanNotHandleNonImageType(last(explode('.', $this->params->get('url'))));
+            throw new CanNotHandleNonImageType(last(explode('.', $requestedUrl)));
         }
 
         // Width
@@ -103,6 +110,12 @@ class ImageController extends Controller
         $this->c = (bool) $this->params->get('crop');
         // Background
         $this->bg = empty($this->params->get('bg')) ? null : $this->params->get('bg');
+
+        if ($this->fallback) {
+            $this->path = config('sz4h-image.not_found_image_path');
+
+            return;
+        }
 
         $this->path = ($this->params->get('type') == 'local') ? public_path($this->params->get('url')) : file_get_contents($this->params->get('url'));
 
@@ -127,7 +140,7 @@ class ImageController extends Controller
 
         return Image::read($this->path);
     }
-    
+
     protected function defaultParams()
     {
         if (! $this->params->has('w')) {
