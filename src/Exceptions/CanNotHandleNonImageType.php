@@ -8,34 +8,29 @@ use Throwable;
 
 class CanNotHandleNonImageType extends BaseInvalidArgumentException
 {
-	/**
-	 * The unit.
-	 *
-	 * @var string
-	 */
-	protected string $extension;
+    /**
+     * The unit.
+     */
+    protected string $extension;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param  string  $extension
-	 * @param  int  $code
-	 * @param  Throwable|null  $previous
-	 */
-	#[Pure] public function __construct(string $extension, $code = 0, Throwable $previous = null)
-	{
-		$this->extension = $extension;
+    /**
+     * Constructor.
+     *
+     * @param  int  $code
+     */
+    #[Pure]
+    public function __construct(string $extension, $code = 0, ?Throwable $previous = null)
+    {
+        $this->extension = $extension;
 
-		parent::__construct("Can not handle non image type file, Extension given: '$extension'", $code, $previous);
-	}
+        parent::__construct("Can not handle non image type file, Extension given: '$extension'", $code, $previous);
+    }
 
-	/**
-	 * Get the unit.
-	 *
-	 * @return string
-	 */
-	public function getExtension(): string
-	{
-		return $this->extension;
-	}
+    /**
+     * Get the unit.
+     */
+    public function getExtension(): string
+    {
+        return $this->extension;
+    }
 }

@@ -4,11 +4,10 @@ namespace Space\Image\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
-use Intervention\Image\Exception\NotFoundException;
-use Intervention\Image\Exceptions\DecoderException;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
-use Intervention\Image\Laravel\Facades\Image;
-use Masterminds\HTML5\Exception;
 use Space\Image\Exceptions\CanNotHandleNonImageType;
 
 class ImageController extends Controller
@@ -19,6 +18,16 @@ class ImageController extends Controller
 
     private bool $fallback = false;
 
+    protected function imageManager(): ImageManager
+    {
+        $driver = config('image.driver', 'gd');
+        $driverInstance = ($driver === 'imagick' && extension_loaded('imagick'))
+            ? new ImagickDriver
+            : new GdDriver;
+
+        return new ImageManager($driverInstance);
+    }
+
     public function resize(?string $url = null)
     {
         $this->url = $url;
@@ -27,8 +36,8 @@ class ImageController extends Controller
         // Make the image
         try {
             $image = $this->getImage($url);
-        } catch (NotFoundException|Exception|DecoderException $e) {
-            $image = Image::read(config('sz4h-image.not_found_image_path'));
+        } catch (\Throwable $e) {
+            $image = $this->imageManager()->read(config('sz4h-image.not_found_image_path'));
         }
 
         // Resize or Crop
@@ -58,7 +67,7 @@ class ImageController extends Controller
     protected function setParams()
     {
         $pathParts = collect(explode('/', (string) $this->url));
-        $presets = config('sz4h-image.presets');
+        $presets = config('sz4h-image.presets', []);
         $this->params = collect([]);
         $type = 'local';
         $presetString = request()->getQueryString();
@@ -69,9 +78,11 @@ class ImageController extends Controller
             $this->params = $this->params->merge($this->getPreset(request()->getQueryString()));
         }
 
-        /* Remove first path key if it is a preset defined */
-        if (in_array($pathParts->first(), array_keys($presets))) {
-            $presetString = $presets[$pathParts->first()];
+        /* Remove first path key if it is a preset defined or 'webp' format prefix */
+        if (in_array($pathParts->first(), array_keys($presets)) || $pathParts->first() === 'webp') {
+            if (isset($presets[$pathParts->first()])) {
+                $presetString = $presets[$pathParts->first()];
+            }
             $pathParts->shift(1);
         }
 
@@ -135,10 +146,10 @@ class ImageController extends Controller
     protected function getImage(?string $url = null)
     {
         if (is_null($url) && ! isset($this->path)) {
-            return Image::read(config('sz4h-image.not_found_image_path'));
+            return $this->imageManager()->read(config('sz4h-image.not_found_image_path'));
         }
 
-        return Image::read($this->path);
+        return $this->imageManager()->read($this->path);
     }
 
     protected function defaultParams()
@@ -169,9 +180,9 @@ class ImageController extends Controller
     protected function watermark(ImageInterface $image): ImageInterface
     {
         try {
-            $watermarkImage = Image::read(config('sz4h-image.watermark.image'));
-        } catch (NotFoundException|Exception $e) {
-            $watermarkImage = Image::read(config('sz4h-image.not_found_image_path'));
+            $watermarkImage = $this->imageManager()->read(config('sz4h-image.watermark.image'));
+        } catch (\Throwable $e) {
+            $watermarkImage = $this->imageManager()->read(config('sz4h-image.not_found_image_path'));
         }
         $wmWidth = $this->h * config('sz4h-image.watermark.ratio');
         $wmHeight = $this->w * config('sz4h-image.watermark.ratio');

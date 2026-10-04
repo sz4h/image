@@ -2,6 +2,4 @@
 
 namespace Space\Image;
 
-class Image
-{
-}
+class Image {}

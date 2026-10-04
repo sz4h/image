@@ -20,7 +20,7 @@ class ImageServiceProvider extends PackageServiceProvider
             ->hasConfigFile('sz4h-image')
             ->hasRoutes('web')
             ->hasViews()
-	        ->hasAssets()
+            ->hasAssets()
             ->hasCommand(ImageCommand::class);
     }
 }
